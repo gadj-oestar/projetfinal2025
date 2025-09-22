@@ -9,30 +9,31 @@ class SpoonacularService
     private $client;
     private $apiKey;
 
-    public function __construct(HttpClientInterface $client, string $apiKey)
+    public function __construct(HttpClientInterface $client)
     {
         $this->client = $client;
-        $this->apiKey = $apiKey;
+        $this->apiKey = $_ENV['SPOONACULAR_API_KEY'];
     }
 
-    /**
-     * Récupère des recettes en fonction des ingrédients
-     * @param array $ingredients
-     * @param int $number
-     * @return array
-     */
-    public function getRecipesByIngredients(array $ingredients, int $number = 5): array
-    {
-        $ingredientsParam = implode(',', $ingredients);
+    public function searchRecipes(string $query, int $number = 5): array
+{
+    $url = 'https://api.spoonacular.com/recipes/complexSearch';
 
-        $response = $this->client->request('GET', 'https://api.spoonacular.com/recipes/findByIngredients', [
+    try {
+        $response = $this->client->request('GET', $url, [
             'query' => [
-                'ingredients' => $ingredientsParam,
-                'number' => $number,
                 'apiKey' => $this->apiKey,
+                'query' => $query,
+                'number' => $number
             ]
         ]);
 
         return $response->toArray();
+    } catch (\Exception $e) {
+        // Retourner une erreur claire au frontend
+        return [
+            'error' => 'Impossible de récupérer les recettes : ' . $e->getMessage()
+        ];
     }
+}
 }

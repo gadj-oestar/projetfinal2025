@@ -19,11 +19,8 @@ function Login() {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      // Stockage du JWT dans le localStorage
       localStorage.setItem("token", response.data.token);
-
-      // Redirection vers la page principale
-      navigate("/");
+      navigate("/recipes");
     } catch (err) {
       console.error(err.response?.data || err);
       setError("Email ou mot de passe incorrect");
