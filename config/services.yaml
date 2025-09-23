@@ -1,0 +1,17 @@
+# config/services.yaml
+
+parameters:
+    spoonacular.api_key: '%env(SPOONACULAR_API_KEY)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+
+    # Injection explicite de la clé API dans ton service
+    App\Service\SpoonacularService:
+        arguments:
+            $apiKey: '%spoonacular.api_key%'
