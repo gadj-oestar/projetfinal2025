@@ -44,17 +44,30 @@ function Recipes() {
 
       if (res.data.results?.length > 0) {
         setRecipes(res.data.results);
+
+        // Récupération de l'historique existant
+        const storedHistory = JSON.parse(localStorage.getItem("history")) || [];
+
+        // Ajouter les nouvelles recettes en évitant les doublons
+        const newHistory = [
+          ...storedHistory,
+          ...res.data.results.filter(
+            (recipe) => !storedHistory.some((h) => h.id === recipe.id)
+          ),
+        ];
+
+        // Sauvegarder dans localStorage
+        localStorage.setItem("history", JSON.stringify(newHistory));
       } else if (res.data.error) {
         setError(res.data.error);
       } else {
         setError("Aucune recette trouvée.");
       }
-    } catch (err) {
-      console.error(err.response?.data || err);
+    } catch (error) {
       setError("Impossible de récupérer les recettes.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   // Récupérer les détails d'une recette

@@ -236,3 +236,7 @@ body.dark .examples-list button {
 body.dark .examples-list button:hover {
   background-color: #16a085;
 }
+.favorites-page {
+  text-align: center;
+  padding: 30px;
+}
