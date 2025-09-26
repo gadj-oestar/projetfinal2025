@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../css/recipes.css";
+import Header from "./Header";
+
 
 function Recipes() {
   const [ingredients, setIngredients] = useState("");
@@ -25,97 +27,115 @@ function Recipes() {
     }
   }, [darkMode]);
 
-  // Rechercher les recettes
-  const handleGenerate = async () => {
-    if (!ingredients.trim()) return;
+// Rechercher les recettes
+const handleGenerate = async () => {
+  // Nettoyer l'entrée utilisateur
+  const query = ingredients.trim();
+  if (!query) return;
 
-    setError("");
-    setLoading(true);
-    setRecipes([]);
-    setSelectedRecipe(null);
+  setError("");
+  setLoading(true);
+  setRecipes([]);
+  setSelectedRecipe(null);
 
+  try {
+    // Vérifier la présence d'un token
     const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Vous devez être connecté pour rechercher des recettes.");
+      return;
+    }
 
-    try {
-      const res = await axios.get(
-        `http://127.0.0.1:8000/api/recipes/${encodeURIComponent(ingredients)}`,
-        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-      );
-
-      if (res.data.results?.length > 0) {
-        setRecipes(res.data.results);
-
-        // Récupération de l'historique existant
-        const storedHistory = JSON.parse(localStorage.getItem("history")) || [];
-
-        // Ajouter les nouvelles recettes en évitant les doublons
-        const newHistory = [
-          ...storedHistory,
-          ...res.data.results.filter(
-            (recipe) => !storedHistory.some((h) => h.id === recipe.id)
-          ),
-        ];
-
-        // Sauvegarder dans localStorage
-        localStorage.setItem("history", JSON.stringify(newHistory));
-      } else if (res.data.error) {
-        setError(res.data.error);
-      } else {
-        setError("Aucune recette trouvée.");
+    // Appel API sécurisé
+    const res = await axios.get(
+      `http://127.0.0.1:8000/api/recipes/${encodeURIComponent(query)}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 10000 // Timeout de 10s pour éviter les requêtes bloquées
       }
-    } catch (error) {
-      setError("Impossible de récupérer les recettes.");
-    } finally {
-      setLoading(false);
+    );
+
+    if (res.data.results?.length > 0) {
+      setRecipes(res.data.results);
+
+      // Historique local sécurisé : éviter les doublons
+      const storedHistory = JSON.parse(localStorage.getItem("history")) || [];
+      const newHistory = [
+        ...storedHistory,
+        ...res.data.results.filter(
+          (recipe) => !storedHistory.some((h) => h.id === recipe.id)
+        ),
+      ];
+      localStorage.setItem("history", JSON.stringify(newHistory));
+    } else if (res.data.error) {
+      setError(res.data.error);
+    } else {
+      setError("Aucune recette trouvée.");
     }
-  };
+  } catch (err) {
+    console.error("Erreur API :", err.response?.data || err.message);
+    setError("Impossible de récupérer les recettes. Veuillez réessayer plus tard.");
+  } finally {
+    setLoading(false);
+  }
+};
 
-  // Récupérer les détails d'une recette
-  const fetchRecipeDetail = async (id) => {
-    setDetailLoading(true);
-    setSelectedRecipe(null);
-    setError("");
+// Détails d'une recette
+const fetchRecipeDetail = async (id) => {
+  setDetailLoading(true);
+  setSelectedRecipe(null);
+  setError("");
 
-    const token = localStorage.getItem("token");
-
-    try {
-      const res = await axios.get(
-        `http://127.0.0.1:8000/api/recipes/detail/${id}`,
-        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-      );
-
-      setSelectedRecipe(res.data);
-    } catch (err) {
-      console.error(err.response?.data || err);
-      setError("Impossible de récupérer les détails de la recette.");
-    }
-
+  const token = localStorage.getItem("token");
+  if (!token) {
+    setError("Vous devez être connecté pour voir les détails.");
     setDetailLoading(false);
-  };
+    return;
+  }
 
-  // Ajouter aux favoris
-  const addFavorite = (recipe) => {
-    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    if (!favorites.find((r) => r.id === recipe.id)) {
-      favorites.push(recipe);
-      localStorage.setItem("favorites", JSON.stringify(favorites));
-      alert(`${recipe.title} ajouté aux favoris !`);
-    }
-  };
+  try {
+    const res = await axios.get(
+      `http://127.0.0.1:8000/api/recipes/detail/${encodeURIComponent(id)}`,
+      { headers: { Authorization: `Bearer ${token}` }, timeout: 10000 }
+    );
+    setSelectedRecipe(res.data);
+  } catch (err) {
+    console.error("Erreur détail :", err.response?.data || err.message);
+    setError("Impossible de récupérer les détails de la recette.");
+  } finally {
+    setDetailLoading(false);
+  }
+};
 
-  // Cliquer sur un exemple
-  const handleExampleClick = (example) => {
-    setIngredients(example);
-  };
+// Ajouter aux favoris
+const addFavorite = (recipe) => {
+  if (!recipe?.id || !recipe?.title) return; // Vérification des données
+
+  const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+  if (!favorites.find((r) => r.id === recipe.id)) {
+    favorites.push(recipe);
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    alert(`${recipe.title} ajouté aux favoris !`);
+  }
+};
+
+// Remplir l'input avec un exemple d'ingrédient
+const handleExampleClick = (example) => {
+  if (typeof example === "string" && example.length < 100) {
+    setIngredients(example.trim());
+  }
+};
+
+
 
   return (
     <div className="recipes-page">
-      {/* Bouton jour/nuit */}
       <button
+        className="button-toggle"
         onClick={toggleDarkMode}
         style={{
-          position: "fixed",
-          top: 20,
+          position: "absolute",
+          top: 130,
           right: 20,
           padding: "8px 15px",
           borderRadius: "8px",

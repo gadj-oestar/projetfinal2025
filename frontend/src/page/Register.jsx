@@ -13,33 +13,47 @@ function Register() {
         email,
         password,
       });
-      alert(res.data.message); // Symfony renvoie un message de succès
+      alert(res.data.message);
     } catch (err) {
       console.error(err);
-      alert("Le mot de passe est trop court. Il doit contenir au moins 6 caractères. Erreur lors de l'inscription.");
+      alert(
+        "Le mot de passe est trop court. Il doit contenir au moins 6 caractères."
+      );
     }
   };
 
   return (
-    <div>
-      <h2>Inscription</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">S'inscrire</button>
-      </form>
+    <div className="register-page">
+      <div className="register-container">
+        <h2>Inscription</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group" data-icon="📧">
+            <label>Email :</label>
+            <input
+              type="email"
+              placeholder="Entrez votre email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="form-group" data-icon="🔒">
+            <label>Mot de passe :</label>
+            <input
+              type="password"
+              placeholder="Entrez votre mot de passe"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button type="submit" className="btn-register">
+            S'inscrire
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

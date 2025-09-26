@@ -20,6 +20,10 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
+            logout:
+                path: app_logout
+                target: /login
+
         # Firewall pour les autres routes API protégées
         api:
             pattern: ^/api

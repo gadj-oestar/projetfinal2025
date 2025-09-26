@@ -4,46 +4,47 @@
   padding: 0;
   box-sizing: border-box;
 }
-body{
- background: linear-gradient(135deg, #0f2027, #203a43, #2c7744);
- 
-}
 
-/* Page register avec un fond animé */
-.register-page {
-  min-height: 100vh;
+/* Body avec un gradient stylé */
+body {
+  font-family: "Poppins", sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: gradientScroll 18s ease infinite;
-  padding: 30px;
-  font-family: "Poppins", sans-serif;
 }
 
-/* Container en glassmorphism */
-.register-container {
+/* Effet glassmorphism */
+.login-container {
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   padding: 2.5rem;
   width: 100%;
-  max-width: 400px;
+  max-width: 380px;
   text-align: center;
   color: #fff;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   animation: fadeScale 0.8s ease-in-out;
 }
 
-/* Titre vert flashy */
-.register-container h2 {
+/* Titre */
+.login-container h2 {
   font-size: 2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.8rem;
   color: #00ff88;
-  text-shadow: 0 0 15px rgba(0, 255, 136, 0.7);
+  text-shadow: 0px 0px 12px rgba(0, 255, 136, 0.6);
 }
 
-/* Champs formulaire */
+/* Messages d'erreur */
+.error {
+  color: #ff4d4d;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  animation: shake 0.4s ease-in-out;
+}
+
+/* Champs */
 .form-group {
   position: relative;
   margin-bottom: 1.5rem;
@@ -75,19 +76,21 @@ body{
   border-left: 3px solid #00ff88;
 }
 
-/* Icône dans le champ */
+/* Icônes dans les inputs */
 .form-group::before {
   content: attr(data-icon);
   position: absolute;
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.1rem;
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  font-size: 1rem;
   color: #00ff88;
 }
 
-/* Bouton inscription */
-.btn-register {
+/* Bouton stylé */
+.btn-login {
   width: 100%;
   padding: 14px;
   border: none;
@@ -101,7 +104,7 @@ body{
   margin-top: 1rem;
 }
 
-.btn-register:hover {
+.btn-login:hover {
   background: linear-gradient(90deg, #00cc66, #00ff88);
   box-shadow: 0 0 15px #00ff88, 0 0 30px rgba(0, 255, 136, 0.6);
   transform: translateY(-2px) scale(1.02);
@@ -119,14 +122,10 @@ body{
   }
 }
 
-@keyframes gradientScroll {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-6px); }
+  100% { transform: translateX(0); }
 }

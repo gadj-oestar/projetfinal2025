@@ -8,20 +8,23 @@ import Register from './page/Register.jsx';
 import Recipes from './page/Recipes.jsx';
 import History from './page/History.jsx';
 import Favorites from './page/Favorites.jsx';
-
+import MainLayout from './page/MainLayout.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/register" element={<Register />} />
+        {/* Pages sans Header */}
         <Route path="/login" element={<Login />} />
-        <Route path="/recipes" element={<Recipes />} />
-        <Route path="/history" element={<History />} />
-        <Route path="/favorites" element={<Favorites />} />
+        <Route path="/register" element={<Register />} />
 
-      
+        {/* Pages avec Header */}
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Recipes />} />
+          <Route path="/app" element={<App />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/favorites" element={<Favorites />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   </StrictMode>

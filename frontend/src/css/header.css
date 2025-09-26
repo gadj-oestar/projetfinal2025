@@ -1,0 +1,99 @@
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #00c853, #1e3c72);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    padding: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+}
+
+.app-header .logo {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.app-header nav ul {
+    display: flex;
+    list-style: none;
+    gap: 1rem;
+}
+
+.app-header nav ul li a,
+.app-header nav ul li button {
+    text-decoration: none;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    transition: 0.3s;
+    font-size: 0.85rem;
+}
+
+.app-header nav ul li a:hover,
+.app-header nav ul li button:hover {
+    background: rgba(255,255,255,0.2);
+    transform: scale(1.05);
+}
+
+.logout-btn {
+    font-weight: bold;
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.hamburger div {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    border-radius: 2px;
+}
+
+@media screen and (max-width: 768px) {
+    .app-header nav {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background: linear-gradient(135deg, #00c853, #1e3c72);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .app-header nav.open {
+        max-height: 300px;
+    }
+
+    .app-header nav ul {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .app-header nav ul li {
+        text-align: center;
+        padding: 0.5rem 0;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+}
+
+/* Pour le padding du contenu sous le header */
+.page-with-header {
+    padding-top: 60px;
+}
