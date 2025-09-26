@@ -193,7 +193,7 @@ body.dark .recipe-item {
 /* Thème nuit détails */
 body.dark .recipe-detail {
   background-color: #3b4b5b;
-  color: #dfe2e2 !important;
+  color: #dfe2e2 ;
 }
 
 /* === Examples === */

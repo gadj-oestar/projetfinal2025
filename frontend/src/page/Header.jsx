@@ -1,5 +1,8 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom"; // Import Link correctement
 import "../css/header.css";
+import Favorite from "./Favorites";
+import History from "./History";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,9 +25,10 @@ const Header = () => {
 
       <nav className={`nav ${isOpen ? "open" : ""}`}>
         <ul>
-          <li><a href="#home">Home</a></li>
-          <li><a href="#howitworks">How it Works</a></li>
-          <li><a href="#recipes">Recipes</a></li>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/favorites">Favorites</Link></li>
+          <li><Link to="/history">History</Link></li>
+          
           <li><button className="logout-btn" onClick={handleLogout}>Logout</button></li>
         </ul>
       </nav>
