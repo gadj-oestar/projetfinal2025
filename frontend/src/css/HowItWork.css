@@ -1,0 +1,72 @@
+/* HowItWork.css */
+
+.how-container {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.how-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.how-subtitle {
+  font-size: 14px;
+  margin-bottom: 30px;
+  color: #555;
+}
+
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.how-card {
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.how-icon {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+.how-card-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.how-text {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Dark mode styles */
+
+
+.dark .how-subtitle {
+  color: #ccc;
+}
+
+
+.light .how-card {
+  background-color: #c5fb7d;
+ 
+}
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 colonnes égales */
+  grid-template-rows: repeat(2, auto);   /* 2 lignes automatiques */
+  gap: 20px;
+}
+
+@media (max-width: 600px) {
+  .how-grid {
+    grid-template-columns: 1fr; /* 1 colonne sur petit écran */
+  }
+}

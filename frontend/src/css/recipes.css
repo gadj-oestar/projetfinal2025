@@ -1,21 +1,21 @@
 /* === Body global === */
 body.light {
-   background:#F4E1C1;
-   margin: 0;
-    padding: 0;
-    color: #333;
-    
+  background: #F4E1C1;
+  margin: 0;
+  padding: 0;
+  color: #333;
+  font-family: Arial, sans-serif;
 }
 
 body.dark {
   background-color: #2c3e50;
+  color: #ecf0f1;
 }
 
 /* === Page recettes === */
 .recipes-page {
   text-align: center;
   padding-top: 40px;
-  font-family: Arial, sans-serif;
 }
 
 /* === Titres === */
@@ -23,7 +23,6 @@ body.dark {
   font-size: 32px;
   font-weight: bold;
   margin-top: 70px;
-  
 }
 
 .subtitle {
@@ -32,11 +31,30 @@ body.dark {
 }
 
 /* === Recherche === */
+.search-section {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto 30px auto;
+  text-align: center;
+}
+
+.button-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
 .search-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 30px;
+  gap: 0;
+  margin-top: 20px;
 }
 
 .search-container input {
@@ -143,7 +161,6 @@ body.dark .search-container button:hover {
   color: white;
 }
 
-/* Thème nuit */
 body.dark .recipe-item {
   background-color: #34495e;
   color: #ecf0f1;
@@ -168,7 +185,7 @@ body.dark .recipe-item {
 }
 
 .recipe-detail h2 {
-  color: #d9dcde;
+  color: #333;
   margin-bottom: 10px;
 }
 
@@ -182,18 +199,15 @@ body.dark .recipe-item {
   list-style: disc;
   padding-left: 20px;
   margin-bottom: 15px;
-  color: #333;
-
 }
 
 .recipe-detail ul li {
   margin-bottom: 5px;
 }
 
-/* Thème nuit détails */
 body.dark .recipe-detail {
   background-color: #3b4b5b;
-  color: #dfe2e2 ;
+  color: #dfe2e2;
 }
 
 /* === Examples === */
@@ -227,7 +241,6 @@ body.dark .recipe-detail {
   background-color: #27ae60;
 }
 
-/* Thème nuit examples */
 body.dark .examples-box {
   background-color: #3b4b5b;
   color: #ecf0f1;
@@ -240,10 +253,15 @@ body.dark .examples-list button {
 body.dark .examples-list button:hover {
   background-color: #16a085;
 }
-.favorites-page {
-  text-align: center;
-  padding: 30px;
-  color: #d9dcde;
+
+/* === Animations === */
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* === Responsive === */

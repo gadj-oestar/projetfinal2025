@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom"; // <-- Import Link
 import "../css/register.css";
 
 function Register() {
@@ -53,6 +54,14 @@ function Register() {
             S'inscrire
           </button>
         </form>
+
+        {/* Lien vers la page de connexion */}
+        <p style={{ marginTop: "15px", textAlign: "center" }}>
+          Vous avez déjà un compte ?{" "}
+          <Link to="/login" style={{ color: "#00c853", textDecoration: "underline" }}>
+            Connectez-vous ici
+          </Link>
+        </p>
       </div>
     </div>
   );

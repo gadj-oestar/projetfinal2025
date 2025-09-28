@@ -9,6 +9,7 @@ import Recipes from './page/Recipes.jsx';
 import History from './page/History.jsx';
 import Favorites from './page/Favorites.jsx';
 import MainLayout from './page/MainLayout.jsx';
+import HowItWork from './page/HowItWork.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -24,6 +25,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/app" element={<App />} />
           <Route path="/history" element={<History />} />
           <Route path="/favorites" element={<Favorites />} />
+          <Route path="/howitwork" element={<HowItWork />} />
         </Route>
       </Routes>
     </BrowserRouter>

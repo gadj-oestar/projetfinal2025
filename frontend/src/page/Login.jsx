@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // <-- Import Link
 import "../css/login.css"; // <-- Ajoute ton CSS ici
 
 function Login() {
@@ -56,6 +56,14 @@ function Login() {
           </div>
           <button type="submit" className="btn-login">Se connecter</button>
         </form>
+
+        {/* Lien vers la page d'enregistrement */}
+        <p style={{ marginTop: "15px", textAlign: "center" }}>
+          Pas encore de compte ?{" "}
+          <Link to="/register" style={{ color: "#00c853", textDecoration: "underline" }}>
+            Inscrivez-vous ici
+          </Link>
+        </p>
       </div>
     </div>
   );
