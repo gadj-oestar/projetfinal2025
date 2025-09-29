@@ -10,6 +10,7 @@ import History from './page/History.jsx';
 import Favorites from './page/Favorites.jsx';
 import MainLayout from './page/MainLayout.jsx';
 import HowItWork from './page/HowItWork.jsx';
+import Admin from './page/Admin.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -26,6 +27,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/history" element={<History />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/howitwork" element={<HowItWork />} />
+          <Route path="/admin" element={<Admin />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,0 +1,132 @@
+/* ===== Admin Page (scopé à .admin-redirect) ===== */
+.admin-redirect {
+  /* plein écran */
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+
+  /* fond gradient élégant vert -> bleu (rappel branding) */
+  background: radial-gradient(1200px circle at 10% 20%, rgba(0,255,135,0.25), transparent 40%),
+              radial-gradient(1000px circle at 90% 80%, rgba(0,180,255,0.22), transparent 45%),
+              linear-gradient(135deg, #0f172a 0%, #0b2233 100%);
+
+  /* mise en page */
+  display: grid;
+  place-items: center;
+
+  /* typo */
+  font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: #e6f6ee;
+  text-align: center;
+}
+
+/* Carte centrale */
+.admin-redirect .card {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  padding: 2.2rem 2.6rem;
+  max-width: 560px;
+  width: calc(100% - 2rem);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.35),
+    inset 0 0 0 1px rgba(255,255,255,0.06);
+  animation: card-pop 600ms cubic-bezier(.2,.7,.3,1) both;
+}
+
+/* Titre + sous-titre */
+.admin-redirect h1 {
+  font-size: clamp(1.3rem, 1rem + 1.2vw, 2rem);
+  margin: 0 0 .4rem;
+  letter-spacing: .2px;
+}
+
+.admin-redirect p {
+  margin: 0.25rem 0 1.4rem;
+  color: #cfe8da;
+  line-height: 1.55;
+}
+
+/* Spinner élégant */
+.admin-redirect .spinner {
+  position: relative;
+  height: 52px;
+  width: 52px;
+  margin: 0 auto 1.2rem;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-top-color: #00ff88;
+  animation: spin 1s linear infinite;
+  box-shadow: 0 0 24px rgba(0,255,136,.35);
+}
+.admin-redirect .spinner::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-right-color: #25a9ff;
+  animation: spin 1.4s linear infinite reverse;
+  filter: drop-shadow(0 0 10px rgba(37,169,255,.35));
+}
+
+/* Capsule info (optionnelle) */
+.admin-redirect .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .45rem .8rem;
+  border-radius: 999px;
+  font-size: .86rem;
+  color: #0b1e16;
+  background: linear-gradient(90deg, #00ff88, #18d09a);
+  box-shadow: 0 6px 16px rgba(0,255,136,.25);
+}
+
+/* Bouton retry (au cas où) */
+.admin-redirect .btn {
+  margin-top: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .75rem 1.1rem;
+  font-weight: 600;
+  color: #0b1e16;
+  background: linear-gradient(90deg, #00ff88, #07c874);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(0,255,136,.28);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.admin-redirect .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(0,255,136,.35);
+}
+.admin-redirect .btn:active {
+  transform: translateY(0);
+}
+
+/* Animations */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes card-pop {
+  from {
+    transform: translateY(6px) scale(.98);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive léger */
+@media (max-width: 440px) {
+  .admin-redirect .card { padding: 1.6rem; }
+  .admin-redirect p { font-size: .95rem; }
+}

@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
-import { useNavigate, Link } from "react-router-dom"; // <-- Import Link
-import "../css/login.css"; // <-- Ajoute ton CSS ici
+import { useNavigate } from "react-router-dom";
+import "../css/login.css";
+
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -14,58 +16,57 @@ function Login() {
     setError("");
 
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/login_check",
-        { email, password },
-        { headers: { "Content-Type": "application/json" } }
-      );
+      const res = await axios.post("http://127.0.0.1:8000/api/login_check", {
+        email,
+        password,
+      });
 
-      localStorage.setItem("token", response.data.token);
-      navigate("/");
+      const token = res.data.token;
+      localStorage.setItem("token", token);
+
+      // Vérifie si c'est Sasuke qui se connecte
+      if (email === "jojo@gmail.com" && password === "azerty") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
-      console.error(err.response?.data || err);
-      setError("Email ou mot de passe incorrect");
+      console.error(err.response?.data || err.message);
+      setError("Email ou mot de passe incorrect.");
     }
   };
 
   return (
     <div className="login-container">
-      <div className="login-card">
-        <h2>Connexion</h2>
-        {error && <p className="error">{error}</p>}
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Email :</label>
-            <input
-              type="email"
-              value={email}
-              placeholder="Entrez votre email"
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Mot de passe :</label>
-            <input
-              type="password"
-              value={password}
-              placeholder="Entrez votre mot de passe"
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button type="submit" className="btn-login">Se connecter</button>
-        </form>
-
-        {/* Lien vers la page d'enregistrement */}
-        <p style={{ marginTop: "15px", textAlign: "center" }}>
-          Pas encore de compte ?{" "}
-          <Link to="/register" style={{ color: "#00c853", textDecoration: "underline" }}>
-            Inscrivez-vous ici
-          </Link>
-        </p>
-      </div>
+  <h2 className="login-title">Connexion</h2>
+  {error && <p className="error">{error}</p>}
+  <form onSubmit={handleSubmit} className="login-form">
+    <div className="form-group">
+      <label>Email:</label>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+        className="input"
+      />
     </div>
+    <div className="form-group">
+      <label>Mot de passe:</label>
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+        className="input"
+      />
+    </div>
+    <button type="submit" className="btn-submit">Se connecter</button>
+  </form>
+  <p className="register-link">
+        Pas encore de compte ? <Link to="/register" style={{ color: "#00c853", textDecoration: "underline" }}>Créer un compte</Link>
+      </p>
+</div>
   );
 }
 
