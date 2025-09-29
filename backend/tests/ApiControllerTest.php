@@ -2,16 +2,46 @@
 
 namespace App\Tests;
 
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ApiControllerTest extends WebTestCase
 {
     private string $token = '';
 
+    private function loginAndGetToken($client): string
+    {
+        $client->request(
+            'POST',
+            '/api/login_check',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode([
+                'email' => 'testuser@example.com',
+                'password' => 'password123'
+            ])
+        );
+
+        $this->assertResponseIsSuccessful();
+        $responseData = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('token', $responseData);
+
+        return $responseData['token'];
+    }
+
     // Test d'inscription
     public function testRegister(): void
     {
         $client = static::createClient();
+        $container = static::getContainer();
+
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = $container->get('doctrine')->getManager();
+
+        // On vide les anciens utilisateurs pour éviter les doublons
+        $entityManager->createQuery('DELETE FROM App\Entity\User')->execute();
 
         $client->request(
             'POST',
@@ -34,24 +64,8 @@ class ApiControllerTest extends WebTestCase
     public function testLogin(): void
     {
         $client = static::createClient();
+        $this->token = $this->loginAndGetToken($client);
 
-        $client->request(
-            'POST',
-            '/api/login_check',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'email' => 'testuser@example.com',
-                'password' => 'password123'
-            ])
-        );
-
-        $this->assertResponseIsSuccessful();
-        $responseData = json_decode($client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('token', $responseData);
-
-        $this->token = $responseData['token'];
         $this->assertNotEmpty($this->token);
     }
 
@@ -59,22 +73,7 @@ class ApiControllerTest extends WebTestCase
     public function testSearchRecipes(): void
     {
         $client = static::createClient();
-
-        // Connexion pour récupérer un token
-        $client->request(
-            'POST',
-            '/api/login_check',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'email' => 'testuser@example.com',
-                'password' => 'password123'
-            ])
-        );
-
-        $loginData = json_decode($client->getResponse()->getContent(), true);
-        $token = $loginData['token'];
+        $token = $this->loginAndGetToken($client);
 
         $client->request(
             'GET',
@@ -93,25 +92,9 @@ class ApiControllerTest extends WebTestCase
     public function testRecipeDetail(): void
     {
         $client = static::createClient();
+        $token = $this->loginAndGetToken($client);
 
-        // Connexion pour récupérer un token
-        $client->request(
-            'POST',
-            '/api/login_check',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'email' => 'testuser@example.com',
-                'password' => 'password123'
-            ])
-        );
-
-        $loginData = json_decode($client->getResponse()->getContent(), true);
-        $token = $loginData['token'];
-
-        // Mettre un ID de recette réel pour le test
-        $recipeId = 716429;
+        $recipeId = 716429; // à remplacer par un ID valide si besoin
 
         $client->request(
             'GET',

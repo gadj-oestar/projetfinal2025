@@ -7,19 +7,16 @@ import Header from "./Header.jsx";
 import HowItWork from "./HowItWork";
 
 function Recipes() {
-  // === STATES ===
-  const [ingredients, setIngredients] = useState(""); // Les ingrédients entrés par l'utilisateur
-  const [recipes, setRecipes] = useState([]); // Liste des recettes récupérées
-  const [selectedRecipe, setSelectedRecipe] = useState(null); // Détails d'une recette sélectionnée
-  const [error, setError] = useState(""); // Message d'erreur
-  const [loading, setLoading] = useState(false); // Chargement de la génération de recettes
-  const [detailLoading, setDetailLoading] = useState(false); // Chargement des détails d'une recette
-  const [darkMode, setDarkMode] = useState(false); // Mode sombre / clair
+  const [ingredients, setIngredients] = useState("");
+  const [recipes, setRecipes] = useState([]);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
-  // === FONCTION POUR TOGGLER LE MODE JOUR/NUIT ===
   const toggleDarkMode = () => setDarkMode(!darkMode);
 
-  // Appliquer la classe CSS "dark" ou "light" au body
   useEffect(() => {
     if (darkMode) {
       document.body.classList.add("dark");
@@ -30,26 +27,24 @@ function Recipes() {
     }
   }, [darkMode]);
 
-  // === FONCTION POUR GÉNÉRER LES RECETTES ===
+  // === GENERER LES RECETTES ===
   const handleGenerate = async () => {
-    const query = ingredients.trim(); // Nettoyage de l'entrée
-    if (!query) return; // Si aucun ingrédient, on quitte
+    const query = ingredients.trim();
+    if (!query) return;
 
-    // Vérifie si l'utilisateur est connecté
     const token = localStorage.getItem("token");
     if (!token) {
       setError("Vous devez être connecté pour générer une recette.");
-      alert("Vous devez être connecté pour générer une recette."); // Notification
-      return; // Stoppe la fonction
+      alert("Vous devez être connecté pour générer une recette.");
+      return;
     }
 
-    setError(""); // Reset des erreurs
-    setLoading(true); // Affiche le loader
-    setRecipes([]); // Reset des recettes
-    setSelectedRecipe(null); // Reset du détail
+    setError("");
+    setLoading(true);
+    setRecipes([]);
+    setSelectedRecipe(null);
 
     try {
-      // Appel API pour récupérer les recettes
       const res = await axios.get(
         `http://127.0.0.1:8000/api/recipes/${encodeURIComponent(query)}`,
         { headers: { Authorization: `Bearer ${token}` }, timeout: 10000 }
@@ -57,31 +52,18 @@ function Recipes() {
 
       if (res.data.results?.length > 0) {
         setRecipes(res.data.results);
-
-        // Historique local : on évite les doublons
-        const storedHistory = JSON.parse(localStorage.getItem("history")) || [];
-        const newHistory = [
-          ...storedHistory,
-          ...res.data.results.filter(
-            (recipe) => !storedHistory.some((h) => h.id === recipe.id)
-          ),
-        ];
-        localStorage.setItem("history", JSON.stringify(newHistory));
-      } else if (res.data.error) {
-        setError(res.data.error);
       } else {
         setError("Aucune recette trouvée.");
       }
     } catch (err) {
       console.error("Erreur API :", err.response?.data || err.message);
-      setError("Impossible de récupérer les recettes. Veuillez réessayer plus tard.");
+      setError("Impossible de récupérer les recettes. Veuillez réessayer.");
     } finally {
-      setLoading(false); // Masque le loader
+      setLoading(false);
     }
   };
 
-  
-  // === FONCTION POUR AFFICHER LES DÉTAILS D'UNE RECETTE ===
+  // === DETAILS D'UNE RECETTE ===
   const fetchRecipeDetail = async (id) => {
     setDetailLoading(true);
     setSelectedRecipe(null);
@@ -97,44 +79,56 @@ function Recipes() {
     try {
       const res = await axios.get(
         `http://127.0.0.1:8000/api/recipes/detail/${encodeURIComponent(id)}`,
-        { headers: { Authorization: `Bearer ${token}` }, timeout: 10000 }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setSelectedRecipe(res.data);
     } catch (err) {
       console.error("Erreur détail :", err.response?.data || err.message);
-      setError("Impossible de récupérer les détails de la recette.");
+      setError("Impossible de récupérer les détails.");
     } finally {
       setDetailLoading(false);
     }
   };
 
-  // === FONCTION POUR AJOUTER AUX FAVORIS ===
-  const addFavorite = (recipe) => {
-    if (!recipe?.id || !recipe?.title) return;
-    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    if (!favorites.find((r) => r.id === recipe.id)) {
-      favorites.push(recipe);
-      localStorage.setItem("favorites", JSON.stringify(favorites));
+  // === AJOUTER AUX FAVORIS EN BDD ===
+  const addFavorite = async (recipe) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Vous devez être connecté pour ajouter aux favoris.");
+      return;
+    }
+
+    try {
+      await axios.post(
+        "http://127.0.0.1:8000/api/favorites",
+        {
+          recipeId: recipe.id,
+          title: recipe.title,
+          image: recipe.image || "",
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       alert(`${recipe.title} ajouté aux favoris !`);
+    } catch (err) {
+      console.error(err.response?.data || err);
+      setError(
+        err.response?.data?.error || "Impossible d'ajouter la recette aux favoris."
+      );
     }
   };
 
-  // === FONCTION POUR EXEMPLES D'INGRÉDIENTS ===
+  // === EXEMPLES D'INGREDIENTS ===
   const handleExampleClick = (example) => {
     if (typeof example === "string" && example.length < 100) {
       setIngredients(example.trim());
     }
   };
 
-  // === RENDER ===
   return (
     <div className={`recipes-page page-with-header ${darkMode ? "dark" : "light"}`}>
-      {/* Header */}
       <Header />
 
-      {/* Section Search */}
       <div className="search-section">
-        {/* Toggle Dark Mode */}
         <button
           className="button-toggle"
           onClick={toggleDarkMode}
@@ -146,11 +140,9 @@ function Recipes() {
           {darkMode ? "Mode Jour" : "Mode Nuit"}
         </button>
 
-        {/* Titres */}
         <h1 className="welcome-title">WELCOME ,</h1>
         <h2 className="subtitle">What ingredients do you have today?</h2>
 
-        {/* Input + Generate */}
         <div className="search-container">
           <input
             type="text"
@@ -164,10 +156,8 @@ function Recipes() {
         </div>
       </div>
 
-      {/* Message d'erreur */}
       {error && <p className="error">{error}</p>}
 
-      {/* Liste des recettes */}
       {recipes.length > 0 && (
         <ul className="recipe-list">
           {recipes.map((recipe) => (
@@ -181,47 +171,34 @@ function Recipes() {
         </ul>
       )}
 
-      {/* Loader détails */}
       {detailLoading && <p>Chargement du détail...</p>}
 
-      {/* Détails recette */}
       {selectedRecipe && (
         <div className="recipe-detail">
           <h2>{selectedRecipe.title}</h2>
-          {selectedRecipe.image && (
-            <img src={selectedRecipe.image} alt={selectedRecipe.title} />
-          )}
+          {selectedRecipe.image && <img src={selectedRecipe.image} alt={selectedRecipe.title} />}
           <p dangerouslySetInnerHTML={{ __html: selectedRecipe.summary }} />
+          <h4>Ingrédients :</h4>
           <ul>
             {selectedRecipe.extendedIngredients?.map((ing) => (
               <li key={ing.id}>{ing.original}</li>
             ))}
           </ul>
+          <h4>Instructions :</h4>
           <p dangerouslySetInnerHTML={{ __html: selectedRecipe.instructions }} />
         </div>
       )}
 
-      {/* Exemples d'ingrédients */}
+      {/* EXEMPLES D'INGREDIENTS */}
       <div className="examples-box">
         <p className="example-title">Examples:</p>
         <div className="examples-list">
-          <button onClick={() => handleExampleClick("egg,tomato,spaghetti")}>
-            egg,tomato,spaghetti
-          </button>
-          <button onClick={() => handleExampleClick("i have a meat rice and bean")}>
-            i have a meat rice and bean
-          </button>
-          <button
-            onClick={() =>
-              handleExampleClick("healthy recipe with carrot tomato and apple")
-            }
-          >
-            healthy recipe with carrot tomato and apple
-          </button>
+          <button onClick={() => handleExampleClick("egg,tomato,spaghetti")}>egg,tomato,spaghetti</button>
+          <button onClick={() => handleExampleClick("i have a meat rice and bean")}>i have a meat rice and bean</button>
+          <button onClick={() => handleExampleClick("healthy recipe with carrot tomato and apple")}>healthy recipe with carrot tomato and apple</button>
         </div>
       </div>
 
-      {/* Section How It Works */}
       <HowItWork />
     </div>
   );
