@@ -1,0 +1,67 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  backend-tests:
+    name: Run Symfony Tests
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: recette3_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, pdo_mysql
+          coverage: xdebug
+
+      - name: Install dependencies (Composer)
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run migrations
+        run: php bin/console doctrine:migrations:migrate --env=test --no-interaction
+
+      - name: Run PHPUnit tests
+        run: php bin/phpunit --testdox
+
+  frontend-build:
+    name: Build React App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies (NPM)
+        run: npm install
+        working-directory: frontend
+
+      - name: Build React App
+        run: npm run build
+        working-directory: frontend
