@@ -11,6 +11,7 @@ import Favorites from './page/Favorites.jsx';
 import MainLayout from './page/MainLayout.jsx';
 import HowItWork from './page/HowItWork.jsx';
 import Admin from './page/Admin.jsx';
+import FavoritesTest from './page/FavoritesTest.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -28,6 +29,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/howitwork" element={<HowItWork />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/favoritestest" element={<FavoritesTest />} />
         </Route>
       </Routes>
     </BrowserRouter>
