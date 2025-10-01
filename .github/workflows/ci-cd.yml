@@ -29,19 +29,16 @@ jobs:
         working-directory: backend   # 👉 toutes les commandes s’exécutent dans backend/
 
     steps:
-      # 1. Récupération du code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Setup PHP
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
           tools: composer
-          extensions: mbstring, intl, pdo_mysql
+          extensions: mbstring, intl, pdo_mysql, openssl
 
-      # 3. Cache Composer dependencies
       - name: Cache Composer dependencies
         uses: actions/cache@v3
         with:
@@ -50,18 +47,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      # 4. Installer les dépendances
       - name: Install dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
-      # 5. Vérifications Symfony (lint)
+      # ✅ Génération des clés JWT
+      - name: Generate JWT keys
+        run: |
+          mkdir -p config/jwt
+          openssl genrsa -out config/jwt/private.pem -aes256 -passout pass:jwt_pass 4096
+          openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem -passin pass:jwt_pass
+
       - name: Symfony lint
         run: |
           php bin/console lint:yaml config
           php bin/console lint:twig templates
           php bin/console lint:container --env=test
 
-      # 6. Attendre que MySQL soit prêt
       - name: Wait for MySQL
         run: |
           for i in {1..10}; do
@@ -70,12 +71,10 @@ jobs:
             sleep 5
           done
 
-      # 7. Préparer la base de données test
       - name: Create test database schema
         run: |
           php bin/console doctrine:database:create --env=test --if-not-exists
           php bin/console doctrine:migrations:migrate --env=test --no-interaction
 
-      # 8. Lancer les tests PHPUnit
       - name: Run PHPUnit tests
         run: php bin/phpunit
