@@ -1,0 +1,51 @@
+name: Symfony CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  symfony-tests:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend   # 👉 toutes les commandes seront lancées dans backend/
+
+    steps:
+      # 1. Récupération du code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Setup PHP avec extensions nécessaires
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+          extensions: mbstring, intl, pdo_mysql
+
+      # 3. Cache des dépendances Composer
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: backend/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      # 4. Installer les dépendances
+      - name: Install dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      # 5. Créer la base de données test
+      - name: Create test database
+        run: |
+          php bin/console doctrine:database:create --env=test || true
+          php bin/console doctrine:migrations:migrate --env=test --no-interaction
+
+      # 6. Lancer les tests PHPUnit
+      - name: Run PHPUnit tests
+        run: php bin/phpunit
