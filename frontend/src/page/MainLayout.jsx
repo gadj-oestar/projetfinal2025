@@ -6,7 +6,9 @@ const MainLayout = () => {
   return (
     <>
       <Header />
-      <Outlet /> {/* rendra la page correspondante */}
+      <main>
+        <Outlet /> {/* rendra la page correspondante */}
+      </main>
     </>
   );
 };

@@ -1,69 +1,87 @@
 import { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom"; // <-- Import Link
-import "../css/register.css";
+import { Link } from "react-router-dom";
+
+import { API_URL } from "../api";
+import AuthLayout from "../components/AuthLayout.jsx";
 
 function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/register", {
-        email,
-        password,
-      });
-      alert(res.data.message);
+      const res = await axios.post(`${API_URL}/api/register`, { email, password });
+      setSuccess(res.data.message || "Compte créé, vous pouvez vous connecter.");
     } catch (err) {
       console.error(err);
-      alert(
-        "Le mot de passe est trop court. Il doit contenir au moins 6 caractères."
+      setError(
+        err.response?.data?.message ||
+          "Le mot de passe est trop court. Il doit contenir au moins 6 caractères."
       );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="register-page">
-      <div className="register-container">
-        <h2>Inscription</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group" data-icon="📧">
-            <label>Email :</label>
-            <input
-              type="email"
-              placeholder="Entrez votre email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+    <AuthLayout>
+      <h1>Créer un compte</h1>
+      <p className="muted">Gratuit, et il ne faut qu'un email.</p>
 
-          <div className="form-group" data-icon="🔒">
-            <label>Mot de passe :</label>
-            <input
-              type="password"
-              placeholder="Entrez votre mot de passe"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          <button type="submit" className="btn-register">
-            S'inscrire
-          </button>
-        </form>
-
-        {/* Lien vers la page de connexion */}
-        <p style={{ marginTop: "15px", textAlign: "center" }}>
-          Vous avez déjà un compte ?{" "}
-          <Link to="/login" style={{ color: "#00c853", textDecoration: "underline" }}>
-            Connectez-vous ici
-          </Link>
+      {error && <p className="alert" role="alert">{error}</p>}
+      {success && (
+        <p className="alert alert-success" role="status">
+          {success} <Link to="/login">Se connecter</Link>
         </p>
-      </div>
-    </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="auth-form">
+        <div className="field">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            placeholder="vous@exemple.fr"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="input"
+          />
+        </div>
+
+        <div className="field">
+          <label htmlFor="password">Mot de passe</label>
+          <input
+            id="password"
+            type="password"
+            autoComplete="new-password"
+            placeholder="6 caractères minimum"
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="input"
+          />
+        </div>
+
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? "Création..." : "S'inscrire"}
+        </button>
+      </form>
+
+      <p className="auth-switch">
+        Vous avez déjà un compte ? <Link to="/login">Connectez-vous</Link>
+      </p>
+    </AuthLayout>
   );
 }
 

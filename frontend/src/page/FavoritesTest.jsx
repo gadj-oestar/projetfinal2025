@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "../css/recipes.css";
 
 function Favorites() {
   const [favorites, setFavorites] = useState([]);
