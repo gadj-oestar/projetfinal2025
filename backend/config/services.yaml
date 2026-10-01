@@ -15,3 +15,7 @@ services:
     App\Service\SpoonacularService:
         arguments:
             $apiKey: '%spoonacular.api_key%'
+
+when@test:
+    services:
+        App\Tests\SpoonacularMockResponseFactory: ~

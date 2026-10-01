@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -12,10 +13,12 @@ class RecipeController extends AbstractController
 {
     private HttpClientInterface $client;
     private string $apiKey;
+    private LoggerInterface $logger;
 
-    public function __construct(HttpClientInterface $client)
+    public function __construct(HttpClientInterface $client, LoggerInterface $logger)
     {
         $this->client = $client;
+        $this->logger = $logger;
         $this->apiKey = $_ENV['SPOONACULAR_API_KEY'] ?? '';
     }
 
@@ -36,9 +39,12 @@ class RecipeController extends AbstractController
                 'results' => $response->toArray(),
             ]);
         } catch (\Exception $e) {
+            // Le message d'origine contient l'URL appelée, donc la clé API : on le garde dans les logs
+            $this->logger->error('Erreur API Spoonacular', ['exception' => $e]);
+
             return new JsonResponse([
-                'error' => 'Erreur API Spoonacular : ' . $e->getMessage(),
-            ], 500);
+                'error' => 'Le service de recettes est indisponible. Réessayez plus tard.',
+            ], 502);
         }
     }
 
@@ -55,9 +61,12 @@ class RecipeController extends AbstractController
 
             return new JsonResponse($response->toArray());
         } catch (\Exception $e) {
+            // Le message d'origine contient l'URL appelée, donc la clé API : on le garde dans les logs
+            $this->logger->error('Erreur API Spoonacular', ['exception' => $e]);
+
             return new JsonResponse([
-                'error' => 'Erreur API Spoonacular : ' . $e->getMessage(),
-            ], 500);
+                'error' => 'Le service de recettes est indisponible. Réessayez plus tard.',
+            ], 502);
         }
     }
 }

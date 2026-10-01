@@ -1,0 +1,40 @@
+# Déploiement Render (offre gratuite) : back Symfony en Docker + front statique
+services:
+  - type: web
+    name: recettebuddy-api
+    runtime: docker
+    plan: free
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: APP_ENV
+        value: prod
+      - key: APP_SECRET
+        generateValue: true
+      - key: JWT_PASSPHRASE
+        generateValue: true
+      - key: CORS_ALLOW_ORIGIN
+        value: '^https://recettebuddy[a-z0-9-]*\.onrender\.com$'
+      - key: DATABASE_URL
+        sync: false
+      - key: MYSQL_SSL_CA
+        sync: false
+      - key: SPOONACULAR_API_KEY
+        sync: false
+
+  - type: web
+    name: recettebuddy
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_HOST
+        fromService:
+          type: web
+          name: recettebuddy-api
+          property: host
