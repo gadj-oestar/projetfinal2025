@@ -109,4 +109,22 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('id', $responseData);
         $this->assertEquals($recipeId, $responseData['id']);
     }
+
+    // Une panne de Spoonacular ne doit pas renvoyer la clé API au client
+    public function testSpoonacularErrorDoesNotLeakApiKey(): void
+    {
+        $client = static::createClient();
+        $token = $this->loginAndGetToken($client);
+
+        $client->request(
+            'GET',
+            '/api/recipes/panne',
+            [],
+            [],
+            ['HTTP_Authorization' => "Bearer $token"]
+        );
+
+        $this->assertResponseStatusCodeSame(502);
+        $this->assertStringNotContainsString('apiKey', $client->getResponse()->getContent());
+    }
 }
