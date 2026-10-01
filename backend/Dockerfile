@@ -20,8 +20,10 @@ RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --opti
     --ignore-platform-req=ext-mongodb
 
 COPY . .
+# serverVersion évite que Doctrine se connecte à la base pendant la construction
 RUN composer dump-autoload --no-dev --classmap-authoritative \
-    && php bin/console assets:install public --no-interaction \
+    && DATABASE_URL="mysql://build:build@127.0.0.1:3306/build?serverVersion=8.0" \
+       php bin/console assets:install public --no-interaction \
     && chmod +x docker/entrypoint.sh
 
 CMD ["docker/entrypoint.sh"]
