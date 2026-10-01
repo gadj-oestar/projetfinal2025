@@ -1,39 +1,43 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
-import "../css/recipes.css";
+import { FaRegHeart } from "react-icons/fa";
+
+import { API_URL, authHeaders, getToken } from "../api";
+import RecipeCard from "../components/RecipeCard.jsx";
+import RecipeModal from "../components/RecipeModal.jsx";
+import useRecipeDetail from "../components/useRecipeDetail.js";
 
 function Favorites() {
   const [favorites, setFavorites] = useState([]);
-  const [selectedRecipe, setSelectedRecipe] = useState(null);
-  const [detailLoading, setDetailLoading] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
+  const detail = useRecipeDetail(setError);
 
   // Charger les favoris depuis la base de données au montage
   useEffect(() => {
     const fetchFavorites = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
+      if (!getToken()) {
         setError("Vous devez être connecté pour voir vos favoris.");
+        setLoaded(true);
         return;
       }
 
       try {
-        const res = await axios.get("http://127.0.0.1:8000/api/favorites", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        // Normaliser les données côté front si nécessaire
-        const favoritesData = res.data.map((fav) => ({
-          id: fav.id,
-          recipeId: fav.recipeId,
-          title: fav.title,
-          image: fav.image,
-        }));
-
-        setFavorites(favoritesData);
+        const res = await axios.get(`${API_URL}/api/favorites`, { headers: authHeaders() });
+        setFavorites(
+          res.data.map((fav) => ({
+            id: fav.id,
+            recipeId: fav.recipeId,
+            title: fav.title,
+            image: fav.image,
+          }))
+        );
       } catch (err) {
         console.error(err.response?.data || err);
         setError("Impossible de récupérer les favoris.");
+      } finally {
+        setLoaded(true);
       }
     };
 
@@ -41,94 +45,51 @@ function Favorites() {
   }, []);
 
   // Supprimer un favori
-  const removeFavorite = async (id) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("Vous devez être connecté pour supprimer un favori.");
-      return;
-    }
-
+  const removeFavorite = async (fav) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/favorites/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setFavorites(favorites.filter((fav) => fav.id !== id));
+      await axios.delete(`${API_URL}/api/favorites/${fav.id}`, { headers: authHeaders() });
+      setFavorites((list) => list.filter((f) => f.id !== fav.id));
     } catch (err) {
       console.error(err.response?.data || err);
       setError("Impossible de supprimer le favori.");
     }
   };
 
-  // Récupérer les détails d'une recette
-  const fetchRecipeDetail = async (recipeId) => {
-    setDetailLoading(true);
-    setSelectedRecipe(null);
-    setError("");
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("Vous devez être connecté pour voir les détails.");
-      setDetailLoading(false);
-      return;
-    }
-
-    try {
-      const res = await axios.get(
-        `http://127.0.0.1:8000/api/recipes/detail/${recipeId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setSelectedRecipe(res.data);
-    } catch (err) {
-      console.error(err.response?.data || err);
-      setError("Impossible de récupérer les détails de la recette.");
-    } finally {
-      setDetailLoading(false);
-    }
-  };
-
   return (
-    <div className="favorites-page">
-      <h1 className="welcome-title">❤️ Mes Recettes Favoris</h1>
+    <div className="container page">
+      <div className="page-head">
+        <div>
+          <h1>Mes favoris</h1>
+          <p>Les recettes que vous avez gardées de côté.</p>
+        </div>
+      </div>
 
-      {error && <p className="error">{error}</p>}
+      {error && <p className="alert" role="alert">{error}</p>}
 
-      {favorites.length === 0 ? (
-        <p>Aucun favori pour le moment.</p>
-      ) : (
-        <ul className="recipe-list">
-          {favorites.map((recipe) => (
-            <li key={recipe.id} className="recipe-item">
-              {recipe.image && <img src={recipe.image} alt={recipe.title} />}
-              <h3>{recipe.title}</h3>
-              <button onClick={() => fetchRecipeDetail(recipe.recipeId)}>
-                Voir détails
-              </button>
-              <button onClick={() => removeFavorite(recipe.id)}>
-                ❌ Supprimer
-              </button>
-            </li>
+      {loaded && !error && favorites.length === 0 && (
+        <div className="empty">
+          <div className="empty-icon"><FaRegHeart /></div>
+          <h2>Aucun favori pour le moment</h2>
+          <p>Cliquez sur le cœur d'une recette pour la retrouver ici.</p>
+          <Link to="/" className="btn btn-primary">Chercher une recette</Link>
+        </div>
+      )}
+
+      {favorites.length > 0 && (
+        <ul className="recipe-grid">
+          {favorites.map((fav) => (
+            <RecipeCard
+              key={fav.id}
+              recipe={fav}
+              onOpen={(r) => detail.openRecipe(r.recipeId)}
+              onRemove={removeFavorite}
+            />
           ))}
         </ul>
       )}
 
-      {detailLoading && <p>Chargement du détail...</p>}
-
-      {selectedRecipe && (
-        <div className="recipe-detail">
-          <h2>{selectedRecipe.title}</h2>
-          {selectedRecipe.image && (
-            <img src={selectedRecipe.image} alt={selectedRecipe.title} />
-          )}
-          <p dangerouslySetInnerHTML={{ __html: selectedRecipe.summary }} />
-          <h4>Ingrédients :</h4>
-          <ul>
-            {selectedRecipe.extendedIngredients?.map((ing) => (
-              <li key={ing.id}>{ing.original}</li>
-            ))}
-          </ul>
-          <h4>Instructions :</h4>
-          <p dangerouslySetInnerHTML={{ __html: selectedRecipe.instructions }} />
-        </div>
+      {detail.open && (
+        <RecipeModal recipe={detail.recipe} loading={detail.loading} onClose={detail.close} />
       )}
     </div>
   );

@@ -1,49 +1,36 @@
 import React from "react";
-import { useTheme } from "@mui/material/styles";
-import { FaShoppingBasket, FaCog, FaComments } from "react-icons/fa";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import "../css/HowItWork.css";
+
+const STEPS = [
+  {
+    title: "Listez vos ingrédients",
+    text: "Tapez ce que vous avez dans le frigo, séparé par des virgules.",
+  },
+  {
+    title: "On cherche pour vous",
+    text: "Notre API interroge Spoonacular et trouve les recettes qui correspondent.",
+  },
+  {
+    title: "Consultez la fiche",
+    text: "Ingrédients, temps de préparation et étapes, tout est au même endroit.",
+  },
+  {
+    title: "Gardez vos préférées",
+    text: "Ajoutez une recette aux favoris pour la retrouver plus tard.",
+  },
+];
 
 const HowItWork = () => {
-  const { darkMode } = useTheme();
-
   return (
-    <section className={`${darkMode ? "dark" : "light"} how-container`}>
-      <h2 className="how-title">HOW IT WORK</h2>
-      <p className="how-subtitle">Generate a delicious recipe in few steps</p>
-
-      <div className="how-grid">
-        <div className="how-card">
-          <FaShoppingBasket className="how-icon" />
-          <h3 className="how-card-title">1. ENTER THE INGREDIENTS</h3>
-          <p className="how-text">
-            Start by typing in the ingredients you have or ingredients of your choice.
-          </p>
-        </div>
-
-        <div className="how-card">
-          <AiOutlineLoading3Quarters className="how-icon" />
-          <h3 className="how-card-title">2. API PROCESSING</h3>
-          <p className="how-text">
-            Hold on tight, your recipe is about to be made thanks to our API.
-          </p>
-        </div>
-
-        <div className="how-card">
-          <FaCog className="how-icon" />
-          <h3 className="how-card-title">3. CUSTOM YOUR RECIPE</h3>
-          <p className="how-text">
-            Choose your cooking style, the ingredients you want to avoid… 
-          </p>
-        </div>
-
-        <div className="how-card">
-          <FaComments className="how-icon" />
-          <h3 className="how-card-title">4. COMMENT, FAVORITES</h3>
-          <p className="how-text">
-            After generating your dish, add it to your favorites and leave a comment.
-          </p>
-        </div>
+    <section className="section">
+      <h2 className="section-title">Comment ça marche</h2>
+      <div className="steps-grid">
+        {STEPS.map((step, i) => (
+          <div className="step" key={step.title}>
+            <span className="step-num">{i + 1}</span>
+            <h3>{step.title}</h3>
+            <p>{step.text}</p>
+          </div>
+        ))}
       </div>
     </section>
   );

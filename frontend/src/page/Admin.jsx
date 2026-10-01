@@ -1,32 +1,25 @@
 import React, { useEffect } from "react";
-import "../css/admin.css";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { API_URL, getToken } from "../api";
+
+const ADMIN_URL = `${API_URL}/admin`;
 
 function Admin() {
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Vous devez être connecté en tant qu'admin !");
+    if (!getToken()) {
       window.location.href = "/login";
     } else {
-      window.location.href = "http://127.0.0.1:8000/admin";
+      window.location.href = ADMIN_URL;
     }
   }, []);
 
   return (
-    <div className="admin-redirect">
-      <div className="card">
-        <div className="spinner" />
-        <h1>Accès au panneau d’administration</h1>
-        <p>Nous vérifions vos droits et ouvrons l’interface EasyAdmin…</p>
-        <span className="chip">Sécurisé • ROLE_ADMIN requis</span>
-        {/* bouton “au cas où” si la redirection n'a pas lieu automatiquement */}
-        <button
-          className="btn"
-          onClick={() => (window.location.href = "http://127.0.0.1:8000/admin")}
-          style={{ display: "inline-flex", marginLeft: ".6rem" }}
-        >
-          Ouvrir maintenant
-        </button>
+    <div className="container">
+      <div className="center-card">
+        <AiOutlineLoading3Quarters className="spin" />
+        <h1>Ouverture de l'administration</h1>
+        <p>Redirection vers EasyAdmin. Le rôle ROLE_ADMIN est requis.</p>
+        <a className="btn btn-primary" href={ADMIN_URL}>Ouvrir maintenant</a>
       </div>
     </div>
   );

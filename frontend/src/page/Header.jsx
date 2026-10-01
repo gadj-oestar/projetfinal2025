@@ -1,42 +1,74 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom"; // Import Link correctement
-import "../css/header.css";
-import Favorite from "./Favorites";
-import History from "./History";
+import React, { useEffect, useState } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { FaBars, FaMoon, FaSun, FaTimes } from "react-icons/fa";
+import { API_URL } from "../api";
+
+const currentTheme = () => {
+  const saved = document.documentElement.dataset.theme;
+  if (saved) return saved;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+};
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [theme, setTheme] = useState(currentTheme);
+  const location = useLocation();
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
+  // Ferme le menu mobile à chaque changement de page
+  useEffect(() => setIsOpen(false), [location.pathname]);
+
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem("theme", next);
+    } catch {
+      // stockage indisponible : le thème reste valable pour la session
+    }
+    setTheme(next);
   };
 
   const handleLogout = async () => {
-    await fetch("http://127.0.0.1:8000/api/logout", {
-      method: "POST",
-      credentials: "include", 
-    });
+    try {
+      await fetch(`${API_URL}/api/logout`, { method: "POST", credentials: "include" });
+    } catch {
+      // la déconnexion côté client suffit si l'API ne répond pas
+    }
+    localStorage.removeItem("token");
     window.location.href = "/login";
   };
 
   return (
     <header className="app-header">
-      <div className="logo">RecetteBuddy</div>
+      <div className="container">
+        <Link to="/" className="brand">
+          <span className="brand-mark" aria-hidden="true">R</span>
+          RecetteBuddy
+        </Link>
 
-      <nav className={`nav ${isOpen ? "open" : ""}`}>
-        <ul>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/favorites">Favorites</Link></li>
-          <li><Link to="/history">History</Link></li>
-          
-          <li><button className="logout-btn" onClick={handleLogout}>Logout</button></li>
-        </ul>
-      </nav>
+        <nav className={`nav ${isOpen ? "open" : ""}`} aria-label="Navigation principale">
+          <NavLink to="/" end>Accueil</NavLink>
+          <NavLink to="/favorites">Favoris</NavLink>
+          <NavLink to="/history">Historique</NavLink>
+          <button onClick={handleLogout}>Déconnexion</button>
+        </nav>
 
-      <div className="hamburger" onClick={toggleMenu}>
-        <div />
-        <div />
-        <div />
+        <button
+          className="icon-btn"
+          onClick={toggleTheme}
+          aria-label={theme === "dark" ? "Passer en mode clair" : "Passer en mode sombre"}
+        >
+          {theme === "dark" ? <FaSun /> : <FaMoon />}
+        </button>
+
+        <button
+          className="icon-btn menu-toggle"
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Menu"
+          aria-expanded={isOpen}
+        >
+          {isOpen ? <FaTimes /> : <FaBars />}
+        </button>
       </div>
     </header>
   );

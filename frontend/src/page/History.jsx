@@ -1,47 +1,67 @@
-import React, { useEffect, useState } from "react";
-import "../css/history.css";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { FaHistory } from "react-icons/fa";
+
+import RecipeModal from "../components/RecipeModal.jsx";
+import useRecipeDetail from "../components/useRecipeDetail.js";
+
+const readHistory = () => JSON.parse(localStorage.getItem("history")) || [];
 
 function History() {
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState(readHistory);
+  const [error, setError] = useState("");
+  const detail = useRecipeDetail(setError);
 
-  // Charger l’historique depuis localStorage
-  useEffect(() => {
-    const storedHistory = JSON.parse(localStorage.getItem("history")) || [];
-    setHistory(storedHistory);
-  }, []);
-
-  // Supprimer l’historique
+  // Supprimer l'historique
   const clearHistory = () => {
     localStorage.removeItem("history");
     setHistory([]);
   };
 
+  const closeDetail = () => {
+    detail.close();
+    setHistory(readHistory());
+  };
+
   return (
-    <div className="history-page">
-      <h1>Historique des recettes générées</h1>
+    <div className="container page">
+      <div className="page-head">
+        <div>
+          <h1>Historique</h1>
+          <p>Les dernières recettes que vous avez consultées sur cet appareil.</p>
+        </div>
+        {history.length > 0 && (
+          <button className="btn btn-ghost btn-sm" onClick={clearHistory}>
+            Vider l'historique
+          </button>
+        )}
+      </div>
+
+      {error && <p className="alert" role="alert">{error}</p>}
 
       {history.length === 0 ? (
-        <p>Aucune recette générée pour le moment.</p>
+        <div className="empty">
+          <div className="empty-icon"><FaHistory /></div>
+          <h2>Rien pour l'instant</h2>
+          <p>Ouvrez une recette depuis l'accueil, elle apparaîtra ici.</p>
+          <Link to="/" className="btn btn-primary">Chercher une recette</Link>
+        </div>
       ) : (
         <ul className="history-list">
-          {history.map((recipe, index) => (
-            <li key={index} className="history-item">
-              {recipe.image && (
-                <img src={recipe.image} alt={recipe.title} className="history-img" />
-              )}
-              <div>
-                <h3>{recipe.title}</h3>
-                <p>ID : {recipe.id}</p>
-              </div>
+          {history.map((recipe) => (
+            <li key={recipe.id} className="history-item">
+              {recipe.image && <img src={recipe.image} alt="" />}
+              <h3>{recipe.title}</h3>
+              <button className="btn btn-ghost btn-sm" onClick={() => detail.openRecipe(recipe.id)}>
+                Revoir
+              </button>
             </li>
           ))}
         </ul>
       )}
 
-      {history.length > 0 && (
-        <button className="clear-btn" onClick={clearHistory}>
-          Vider l’historique
-        </button>
+      {detail.open && (
+        <RecipeModal recipe={detail.recipe} loading={detail.loading} onClose={closeDetail} />
       )}
     </div>
   );
