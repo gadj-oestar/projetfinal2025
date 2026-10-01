@@ -35,6 +35,10 @@ when@test:
 
 when@prod:
     doctrine:
+        dbal:
+            # Connexion chiffrée vers la base MySQL hébergée (certificat écrit par docker/entrypoint.sh)
+            options:
+                !php/const PDO::MYSQL_ATTR_SSL_CA: '%kernel.project_dir%/config/mysql-ca.pem'
         orm:
             auto_generate_proxy_classes: false
             proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'

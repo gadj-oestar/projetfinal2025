@@ -1,6 +1,9 @@
 import axios from "axios";
 
-export const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+// En ligne, Render fournit l'hôte du back dans VITE_API_HOST
+export const API_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.VITE_API_HOST ? `https://${import.meta.env.VITE_API_HOST}` : "http://127.0.0.1:8000");
 
 export const getToken = () => localStorage.getItem("token");
 

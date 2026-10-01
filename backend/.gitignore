@@ -17,3 +17,5 @@
 /phpunit.xml
 /.phpunit.cache/
 ###< phpunit/phpunit ###
+
+/config/mysql-ca.pem
