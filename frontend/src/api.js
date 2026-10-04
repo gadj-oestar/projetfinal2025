@@ -5,6 +5,13 @@ export const API_URL =
   import.meta.env.VITE_API_URL ||
   (import.meta.env.VITE_API_HOST ? `https://${import.meta.env.VITE_API_HOST}` : "http://127.0.0.1:8000");
 
+// Délai maximum d'une requête : le back gratuit de Render peut mettre
+// environ une minute à se réveiller, au-delà on affiche une erreur
+axios.defaults.timeout = 70000;
+
+// Message à afficher quand le back ne répond pas (pas de réponse HTTP)
+export const NETWORK_ERROR = "Le serveur ne répond pas. Réessayez dans une minute.";
+
 export const getToken = () => localStorage.getItem("token");
 
 export const authHeaders = () => ({ Authorization: `Bearer ${getToken()}` });

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-import { API_URL, getRoles } from "../api";
+import { API_URL, NETWORK_ERROR, getRoles } from "../api";
 import AuthLayout from "../components/AuthLayout.jsx";
 
 function Login() {
@@ -25,7 +25,7 @@ function Login() {
       navigate(getRoles().includes("ROLE_ADMIN") ? "/admin" : "/");
     } catch (err) {
       console.error(err.response?.data || err.message);
-      setError("Email ou mot de passe incorrect.");
+      setError(err.response ? "Email ou mot de passe incorrect." : NETWORK_ERROR);
     } finally {
       setLoading(false);
     }
