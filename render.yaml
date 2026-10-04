@@ -14,7 +14,7 @@ services:
       - key: JWT_PASSPHRASE
         generateValue: true
       - key: CORS_ALLOW_ORIGIN
-        value: '^https://recettebuddy[a-z0-9-]*\.onrender\.com$'
+        value: '^https://(recettebuddy|projetfinal2025)[a-z0-9-]*\.onrender\.com$'
       - key: DATABASE_URL
         sync: false
       - key: MYSQL_SSL_CA
