@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { FaBars, FaMoon, FaSun, FaTimes } from "react-icons/fa";
-import { API_URL } from "../api";
+import { getToken } from "../api";
 
 const currentTheme = () => {
   const saved = document.documentElement.dataset.theme;
@@ -13,6 +13,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [theme, setTheme] = useState(currentTheme);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Ferme le menu mobile à chaque changement de page
   useEffect(() => setIsOpen(false), [location.pathname]);
@@ -28,15 +29,14 @@ const Header = () => {
     setTheme(next);
   };
 
-  const handleLogout = async () => {
-    try {
-      await fetch(`${API_URL}/api/logout`, { method: "POST", credentials: "include" });
-    } catch {
-      // la déconnexion côté client suffit si l'API ne répond pas
-    }
+  // Le JWT est sans état : supprimer le jeton suffit, sans attendre l'API
+  // (qui peut mettre une minute à se réveiller sur l'offre gratuite de Render)
+  const handleLogout = () => {
     localStorage.removeItem("token");
-    window.location.href = "/login";
+    navigate("/login");
   };
+
+  const loggedIn = Boolean(getToken());
 
   return (
     <header className="app-header">
@@ -50,7 +50,11 @@ const Header = () => {
           <NavLink to="/" end>Accueil</NavLink>
           <NavLink to="/favorites">Favoris</NavLink>
           <NavLink to="/history">Historique</NavLink>
-          <button onClick={handleLogout}>Déconnexion</button>
+          {loggedIn ? (
+            <button onClick={handleLogout}>Déconnexion</button>
+          ) : (
+            <NavLink to="/login">Connexion</NavLink>
+          )}
         </nav>
 
         <button
