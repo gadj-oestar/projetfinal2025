@@ -21,6 +21,9 @@ services:
         sync: false
       - key: SPOONACULAR_API_KEY
         sync: false
+      # Optionnel : un email fait passer le quota gratuit MyMemory de 5 000 à 50 000 caractères par jour
+      - key: MYMEMORY_EMAIL
+        sync: false
 
   - type: web
     name: recettebuddy

@@ -86,6 +86,8 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('results', $responseData);
+        // Les titres sont traduits en français
+        $this->assertSame('[fr] Pasta de test', $responseData['results'][0]['title']);
     }
 
     // Test des détails d'une recette
@@ -108,6 +110,12 @@ class ApiControllerTest extends WebTestCase
         $responseData = json_decode($client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('id', $responseData);
         $this->assertEquals($recipeId, $responseData['id']);
+
+        // Titre, résumé (sans HTML ni lien Spoonacular), ingrédients et étapes traduits
+        $this->assertSame('[fr] Test recipe', $responseData['title']);
+        $this->assertSame('[fr] A tasty dish.', $responseData['summary']);
+        $this->assertSame(['[fr] 2 eggs'], $responseData['ingredients']);
+        $this->assertSame(['[fr] Boil the eggs.'], $responseData['steps']);
     }
 
     // Une panne de Spoonacular ne doit pas renvoyer la clé API au client

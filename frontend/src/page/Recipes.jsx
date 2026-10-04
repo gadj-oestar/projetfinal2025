@@ -9,8 +9,8 @@ import useRecipeDetail from "../components/useRecipeDetail.js";
 import useToast from "../components/useToast.js";
 import HowItWork from "./HowItWork";
 
-// Exemples envoyés tels quels à Spoonacular (qui attend des ingrédients en anglais)
-const EXAMPLES = ["egg, tomato, spaghetti", "rice, beans, beef", "carrot, tomato, apple"];
+// Le back traduit les ingrédients en anglais avant d'interroger Spoonacular
+const EXAMPLES = ["œuf, tomate, spaghetti", "riz, haricots, bœuf", "carotte, tomate, pomme"];
 
 function Recipes() {
   const [ingredients, setIngredients] = useState("");
@@ -38,7 +38,6 @@ function Recipes() {
     try {
       const res = await axios.get(`${API_URL}/api/recipes/${encodeURIComponent(query)}`, {
         headers: authHeaders(),
-        timeout: 10000,
       });
 
       if (res.data.results?.length > 0) {
@@ -88,7 +87,7 @@ function Recipes() {
         <form className="search" onSubmit={handleGenerate} role="search">
           <input
             type="text"
-            placeholder="Ex. : egg, tomato, rice"
+            placeholder="Ex. : œuf, tomate, riz"
             aria-label="Vos ingrédients"
             value={ingredients}
             onChange={(e) => setIngredients(e.target.value)}
@@ -97,7 +96,7 @@ function Recipes() {
             {loading ? <AiOutlineLoading3Quarters className="spin" /> : "Trouver des recettes"}
           </button>
         </form>
-        <p className="hint">Ingrédients en anglais, séparés par des virgules.</p>
+        <p className="hint">Ingrédients en français ou en anglais, séparés par des virgules.</p>
 
         <div className="chips">
           {EXAMPLES.map((ex) => (

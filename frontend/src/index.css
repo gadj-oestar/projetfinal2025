@@ -706,6 +706,7 @@ input {
   font-size: 0.95rem;
 }
 
+ol.steps,
 .steps ol {
   padding-left: 20px;
   margin: 0;

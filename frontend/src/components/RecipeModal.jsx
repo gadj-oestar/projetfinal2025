@@ -42,20 +42,22 @@ function RecipeModal({ recipe, loading, onClose }) {
                 {recipe.servings && <span className="tag">{recipe.servings} personnes</span>}
               </div>
 
-              {recipe.summary && (
-                <p className="summary" dangerouslySetInnerHTML={{ __html: recipe.summary }} />
-              )}
+              {recipe.summary && <p className="summary">{recipe.summary}</p>}
 
               <h3>Ingrédients</h3>
               <ul className="ingredients">
-                {recipe.extendedIngredients?.map((ing, i) => (
-                  <li key={`${ing.id}-${i}`}>{ing.original}</li>
+                {recipe.ingredients?.map((ing, i) => (
+                  <li key={i}>{ing}</li>
                 ))}
               </ul>
 
               <h3>Préparation</h3>
-              {recipe.instructions ? (
-                <div className="steps" dangerouslySetInnerHTML={{ __html: recipe.instructions }} />
+              {recipe.steps?.length ? (
+                <ol className="steps">
+                  {recipe.steps.map((step, i) => (
+                    <li key={i}>{step}</li>
+                  ))}
+                </ol>
               ) : (
                 <p className="muted">Pas d'instructions fournies pour cette recette.</p>
               )}
