@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-import { API_URL } from "../api";
+import { API_URL, NETWORK_ERROR } from "../api";
 import AuthLayout from "../components/AuthLayout.jsx";
 
 function Register() {
@@ -22,10 +22,11 @@ function Register() {
       setSuccess(res.data.message || "Compte créé, vous pouvez vous connecter.");
     } catch (err) {
       console.error(err);
-      setError(
-        err.response?.data?.message ||
-          "Le mot de passe est trop court. Il doit contenir au moins 6 caractères."
-      );
+      if (!err.response) {
+        setError(NETWORK_ERROR);
+      } else {
+        setError(err.response.data?.message || "Impossible de créer le compte. Cet email est peut-être déjà utilisé.");
+      }
     } finally {
       setLoading(false);
     }
