@@ -17,3 +17,17 @@ framework:
         # Namespaced pools use the above "app" backend by default
         #pools:
             #my.dedicated.cache: null
+
+        pools:
+            # Traductions MyMemory (voir App\Service\Translator)
+            translation.cache:
+                adapter: cache.adapter.filesystem
+
+when@prod:
+    framework:
+        cache:
+            pools:
+                # En ligne, le disque de Render est effacé à chaque redémarrage :
+                # les traductions sont donc gardées dans la base MySQL
+                translation.cache:
+                    adapter: cache.adapter.doctrine_dbal
